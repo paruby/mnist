@@ -5,7 +5,7 @@
 
 <script>
 //import * as tf from '@tensorflow/tfjs';
-const model = tf.loadLayersModel('./model/model.json');
+const model = await tf.loadLayersModel('./model/model.json');
 
 
 </script>
@@ -13,5 +13,6 @@ const model = tf.loadLayersModel('./model/model.json');
 </header>
 <body>
 Hello world
+<canvas id='canvas' width=28 height=28 style="width:200px height:200px"></canvas>
 </body>
 </html>
