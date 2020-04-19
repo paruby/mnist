@@ -3,7 +3,18 @@
 <title>This is title</title>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
 
-<script src='model.js' async></script>
+<script>
+//import * as tf from '@tensorflow/tfjs';
+
+async function loadModel(){
+    const model = await tf.loadLayersModel('./model/model.json');
+    return model;
+}
+
+const model = loadModel();
+
+
+</script>
 
 </header>
 <body>
