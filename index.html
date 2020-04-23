@@ -1,24 +1,159 @@
 <html>
 <header>
 <title>This is title</title>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"> </script>
 
 <script>
 //import * as tf from '@tensorflow/tfjs';
 
+var model;
+
 async function loadModel(){
-    const model = await tf.loadLayersModel('./model/model.json');
-    return model;
+    model = await tf.loadLayersModel('./model/model.json');
 }
 
-const model = loadModel();
+//const model = loadModel();
 
+loadModel();
+var canvas, ctx, flag = false,
+    prevX = 0,
+    currX = 0,
+    prevY = 0,
+    currY = 0,
+    dot_flag = false;
+
+var x = "black",
+    y = 2;
+
+function init() {
+    canvas = document.getElementById("canvas");
+    ctx = canvas.getContext("2d");
+    //ctx.fillStyle = "black";
+    //ctx.fillRect(10, 4, 2, 20);
+    canvas.addEventListener("mousemove", function (e) {
+        findxy('move', e)
+    }, false);
+    canvas.addEventListener("mousedown", function (e) {
+        findxy('down', e)
+    }, false);
+    canvas.addEventListener("mouseup", function (e) {
+        findxy('up', e)
+    }, false);
+    canvas.addEventListener("mouseout", function (e) {
+        findxy('out', e)
+    }, false);
+}
+
+function draw() {
+    //console.log("drawing")
+    //console.log(x)
+    //console.log(y)
+    //ctx.beginPath();
+    //ctx.moveTo(prevX, prevY);
+    //ctx.lineTo(currX, currY);
+    //ctx.strokeStyle = x;
+    //ctx.lineWidth = y;
+    //ctx.stroke();
+    //ctx.closePath();
+    ctx.fillRect(currX, currY, 2, 2);
+}
+
+function findxy(res, e) {
+    if (res == 'down') {
+        //console.log("down")
+        prevX = currX;
+        prevY = currY;
+        //console.log(e)
+        currX = (e.clientX - canvas.offsetLeft) * (28 / 200);
+        currY = (e.clientY - canvas.offsetTop) * (28 / 200);
+
+
+        flag = true;
+        dot_flag = true;
+        if (dot_flag) {
+            ctx.beginPath();
+            ctx.fillStyle = x;
+            ctx.fillRect(currX, currY, 2, 2);
+            ctx.closePath();
+            dot_flag = false;
+        }
+    }
+    if (res == 'up' || res == "out") {
+        flag = false;
+    }
+    if (res == 'move') {
+        if (flag) {
+            prevX = currX;
+            prevY = currY;
+            currX = (e.clientX - canvas.offsetLeft) * (28 / 200);
+            currY = (e.clientY - canvas.offsetTop) * (28 / 200);
+            draw();
+        }
+    }
+}
+
+function get_canvas() {  
+    var imageData = ctx.getImageData(0, 0, 28, 28);
+    var data = imageData.data;
+    return data
+}
+
+function canvas_to_tensor(array) {
+    var skip_pixel = 4;
+    var array_size = 28;
+    var tmp1 = [];
+    for(var i = 0; i < array.length; i += skip_pixel) {
+        tmp1.push((array[i+3]) / 255.0);
+    }
+    var tmp2 = [];
+    for(var i = 0; i < tmp1.length; i += array_size) {
+        tmp2.push(tmp1.slice(i, i + array_size));
+    }
+    tensor = tf.tensor(tmp2)
+    tensor = tf.expandDims(tensor, 0)
+    tensor = tf.expandDims(tensor, -1)
+    return tensor
+}
+
+
+
+function run_model() {
+    tensor = canvas_to_tensor(get_canvas())
+    logits = model.predict(tensor)
+    prediction = tf.argMax(logits, axis=1).dataSync()[0]
+    //console.log(tensor.shape)
+    //console.log(tensor.dataSync())
+    //console.log(prediction)
+    document.getElementById('prediction').innerHTML = prediction
+}
+
+function clear_canvas() {
+    //ctx.fillStyle = "white";
+    //ctx.fillRect(0, 0, 28, 28);
+    //ctx.fillStyle = "black";
+    ctx.clearRect(0, 0, 28, 28);
+    document.getElementById('prediction').innerHTML = ""
+}
 
 </script>
 
 </header>
-<body>
-Hello world
-<canvas id='canvas' width=28 height=28 style="width:200px; height:200px"></canvas>
+<body onload="init()">
+
+Draw your favourite digit (0-9) in the box below!
+<br>
+
+<canvas id='canvas' width=28 height=28 style="width:200px; height:200px;
+    border:2px solid"></canvas>
+
+<br>
+Prediction:
+<div id="prediction"></div>
+<br>
+<button id="pred_button" onclick="run_model()">Read</button>
+
+<br>
+<br>
+<button id="clear_button" onclick="clear_canvas()">Clear</button>
 </body>
 </html>
