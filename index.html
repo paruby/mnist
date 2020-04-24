@@ -1,6 +1,8 @@
 <html>
 <header>
 <title>Digit reader</title>
+<meta name="viewport" content="width=400, user-scalable=0;">
+
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"> </script>
 
 <script>
@@ -41,6 +43,27 @@ function init() {
     }, false);
     canvas.addEventListener("mouseout", function (e) {
         findxy('out', e)
+    }, false);
+
+    canvas.addEventListener("touchstart", function (e) {
+      var touch = e.touches[0];
+      var mouseEvent = new MouseEvent("mousedown", {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+      });
+      canvas.dispatchEvent(mouseEvent);
+    }, false);
+    canvas.addEventListener("touchend", function (e) {
+      var mouseEvent = new MouseEvent("mouseup", {});
+      canvas.dispatchEvent(mouseEvent);
+    }, false);
+    canvas.addEventListener("touchmove", function (e) {
+      var touch = e.touches[0];
+      var mouseEvent = new MouseEvent("mousemove", {
+        clientX: touch.clientX,
+        clientY: touch.clientY
+      });
+      canvas.dispatchEvent(mouseEvent);
     }, false);
 }
 
@@ -132,28 +155,54 @@ function clear_canvas() {
     //ctx.fillRect(0, 0, 28, 28);
     //ctx.fillStyle = "black";
     ctx.clearRect(0, 0, 28, 28);
-    document.getElementById('prediction').innerHTML = ""
+    document.getElementById('prediction').innerHTML = "&nbsp"
 }
 
 </script>
 
+<style>
+.content {
+  margin: auto;
+  text-align:center
+
+} 
+.button {
+  background-color: #555555;
+  border: none;
+  color: white;
+  padding: 10px 17px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+</style>
+
 </header>
 <body onload="init()">
+<div class="content">
+<h2>
+MNIST in the browser
+</h2>
 
+
+<p>
 Draw your favourite digit (0-9) in the box below!
+</p>
 <br>
 
 <canvas id='canvas' width=28 height=28 style="width:200px; height:200px;
     border:2px solid"></canvas>
 
 <br>
-Prediction:
-<div id="prediction"></div>
+Prediction: <div id="prediction">&nbsp </div>
 <br>
-<button id="pred_button" onclick="run_model()">Read</button>
+<button class="button" id="pred_button" onclick="run_model()">Read</button>
 
 <br>
 <br>
-<button id="clear_button" onclick="clear_canvas()">Clear</button>
+<button class= "button" id="clear_button" onclick="clear_canvas()">Clear</button>
+</div>
 </body>
 </html>
