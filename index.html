@@ -82,7 +82,6 @@ function draw() {
 }
 
 function findxy(res, e) {
-    e.preventDefault();
     if (res == 'down') {
         //console.log("down")
         prevX = currX;
@@ -164,8 +163,8 @@ function clear_canvas() {
 <style>
 .content {
   margin: auto;
-  text-align:center
-
+  text-align:center;
+  overscroll-behavior: none;
 } 
 .button {
   background-color: #555555;
