@@ -1,6 +1,6 @@
 # MNIST in the browser
 
-Recognise hand-written digits in the browser!
+Recognise hand-written digits in the browser! <a href="https://paruby.github.io/mnist/">https://paruby.github.io/mnist/</a>
 
 <img src="demo.gif" alt="demo" style="width: 640px;"/>
 
